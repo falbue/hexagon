@@ -84,7 +84,7 @@ def create_game(mode: str = "local") -> dict:
             "2": {"pieces": _make_pieces()},
         },
         "current_player": "1",
-        "status": "playing" if mode == "local" else "waiting",
+        "status": "playing",    # both modes start immediately; player check enforces turns
         "winner": None,
         "scores": {"1": 0, "2": 0},
         "last_move": None,

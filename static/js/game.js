@@ -321,7 +321,8 @@ class HexGame {
       const cp = this._currentPlayerPieces();
       if (cp && this.selIndex < cp.length) {
         const p = cp[this.selIndex];
-        const typeName = ["без меток", "2 метки", "3 метки"][p.type === 0 ? 0 : p.type === 2 ? 1 : 2];
+        const typeNames = { 0: "без меток", 2: "2 метки", 3: "3 метки" };
+        const typeName = typeNames[p.type] ?? "неизвестно";
         info.textContent = `Выбрана: ${typeName} | Поворот: ${this.selRotation * 60}°`;
         btnRot.disabled = false;
         btnDesel.style.display = "inline-flex";
@@ -502,9 +503,15 @@ class HexGame {
   }
 
   _connectWS() {
+    if (this._wsRetries === undefined) this._wsRetries = 0;
+
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
     const url   = `${proto}//${location.host}/ws/${this.gameId}`;
     this.ws     = new WebSocket(url);
+
+    this.ws.onopen = () => {
+      this._wsRetries = 0; // reset on successful connection
+    };
 
     this.ws.onmessage = (ev) => {
       const data = JSON.parse(ev.data);
@@ -521,7 +528,14 @@ class HexGame {
       }
     };
 
-    this.ws.onclose = () => setTimeout(() => this._connectWS(), 3000);
+    this.ws.onclose = () => {
+      // Stop reconnecting if game is over or max retries exceeded
+      if (this.state?.status === "finished") return;
+      if (this._wsRetries >= 10) return;
+      const delay = Math.min(1000 * 2 ** this._wsRetries, 30000);
+      this._wsRetries++;
+      setTimeout(() => this._connectWS(), delay);
+    };
   }
 
   // ── Game-over ──────────────────────────────────────────────────────

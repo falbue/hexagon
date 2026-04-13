@@ -83,10 +83,14 @@
       };
     });
 
-    document.getElementById('btn-copy').addEventListener('click', () => {
+    document.getElementById('btn-copy').addEventListener('click', async () => {
       const input = document.getElementById('online-link');
-      input.select();
-      document.execCommand('copy');
+      try {
+        await navigator.clipboard.writeText(input.value);
+      } catch (_) {
+        input.select();
+        document.execCommand('copy');
+      }
       document.getElementById('btn-copy').textContent = 'Скопировано!';
       setTimeout(() => document.getElementById('btn-copy').textContent = 'Копировать', 2000);
     });
