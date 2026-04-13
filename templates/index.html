@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Гекснашки</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="home-body">
+  <div class="home-container">
+    <div class="home-logo">
+      <svg width="80" height="80" viewBox="0 0 100 100">
+        <polygon points="50,5 93,27.5 93,72.5 50,95 7,72.5 7,27.5"
+                 fill="#3b82f6" stroke="#60a5fa" stroke-width="3"/>
+        <line x1="50" y1="30" x2="50" y2="15" stroke="white" stroke-width="3" marker-end="url(#arr)"/>
+        <line x1="50" y1="70" x2="50" y2="85" stroke="white" stroke-width="3"/>
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="white"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h1 class="home-title">Гекснашки</h1>
+    <p class="home-subtitle">
+      Оригинальная логическая игра — сплав пятнашек и реверси<br>
+      на шестиугольном поле
+    </p>
+
+    <div class="home-rules">
+      <h2>Правила</h2>
+      <ul>
+        <li>У каждого игрока 9 фишек: 3 без меток, 3 с двумя метками и 3 с тремя метками.</li>
+        <li>Метки — стрелки, указывающие на соседние клетки. Фишки можно <strong>вращать</strong> перед расстановкой.</li>
+        <li><strong>Захват:</strong> если ваша метка указывает на фишку противника — она становится вашей.</li>
+        <li><strong>Цепной захват:</strong> если метки двух фишек «смотрят» друг на друга, захватываются и все клетки, на которые указывают метки захваченной фишки (только один шаг).</li>
+        <li>Когда оба игрока расставили все фишки, побеждает тот, у кого больше клеток на поле.</li>
+      </ul>
+    </div>
+
+    <div class="home-buttons">
+      <button class="btn btn-primary" id="btn-local">
+        🖥️ Играть на одном устройстве
+      </button>
+      <button class="btn btn-secondary" id="btn-online">
+        🌐 Создать онлайн-игру
+      </button>
+    </div>
+
+    <div id="online-link-box" class="online-link-box" style="display:none;">
+      <p>Отправьте эту ссылку второму игроку:</p>
+      <div class="link-row">
+        <input id="online-link" type="text" readonly/>
+        <button class="btn btn-copy" id="btn-copy">Копировать</button>
+      </div>
+      <button class="btn btn-primary" id="btn-go-game" style="margin-top:12px;">Перейти к игре</button>
+    </div>
+  </div>
+
+  <script>
+    async function createGame(mode) {
+      const resp = await fetch('/create-game', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({mode})
+      });
+      return (await resp.json()).game_id;
+    }
+
+    document.getElementById('btn-local').addEventListener('click', async () => {
+      const id = await createGame('local');
+      window.location.href = `/game/${id}`;
+    });
+
+    document.getElementById('btn-online').addEventListener('click', async () => {
+      const id = await createGame('online');
+      const p2url = `${window.location.origin}/game/${id}?player=2`;
+      document.getElementById('online-link').value = p2url;
+      document.getElementById('online-link-box').style.display = 'block';
+      document.getElementById('btn-go-game').onclick = () => {
+        window.location.href = `/game/${id}?player=1`;
+      };
+    });
+
+    document.getElementById('btn-copy').addEventListener('click', async () => {
+      const input = document.getElementById('online-link');
+      try {
+        await navigator.clipboard.writeText(input.value);
+      } catch (_) {
+        input.select();
+        document.execCommand('copy');
+      }
+      document.getElementById('btn-copy').textContent = 'Скопировано!';
+      setTimeout(() => document.getElementById('btn-copy').textContent = 'Копировать', 2000);
+    });
+  </script>
+</body>
+</html>

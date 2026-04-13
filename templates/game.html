@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Гекснашки</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="game-body">
+  <!-- Hidden data element read by JS -->
+  <div id="game-data"
+       data-game-id="{{ game_id }}"
+       data-player-id="{{ player_id }}"
+       data-mode="{{ mode }}">
+  </div>
+
+  <!-- Header -->
+  <header class="game-header">
+    <a href="/" class="home-link">← На главную</a>
+    <div class="header-center">
+      <span class="game-title-small">Гекснашки</span>
+      <span id="turn-indicator" class="turn-indicator">Загрузка…</span>
+    </div>
+    <div class="scores">
+      <span class="score-badge p1-badge">🔵 <span id="score1">0</span></span>
+      <span class="score-sep">:</span>
+      <span class="score-badge p2-badge">🔴 <span id="score2">0</span></span>
+    </div>
+  </header>
+
+  <!-- Main layout -->
+  <main class="game-main">
+
+    <!-- Player 1 piece panel -->
+    <aside class="piece-panel panel-left" id="panel-p1">
+      <div class="panel-label p1-label">Игрок 1</div>
+      <div class="pieces-grid" id="player1-pieces"></div>
+    </aside>
+
+    <!-- Board -->
+    <section class="board-section">
+      <canvas id="board-canvas"></canvas>
+    </section>
+
+    <!-- Player 2 piece panel -->
+    <aside class="piece-panel panel-right" id="panel-p2">
+      <div class="panel-label p2-label">Игрок 2</div>
+      <div class="pieces-grid" id="player2-pieces"></div>
+    </aside>
+
+  </main>
+
+  <!-- Bottom toolbar -->
+  <div class="game-toolbar">
+    <div class="selected-info" id="selected-info">Выберите фишку</div>
+    <button class="btn btn-rotate" id="btn-rotate" disabled>⟳ Повернуть (R)</button>
+    <button class="btn btn-deselect" id="btn-deselect" style="display:none">✕ Отменить</button>
+  </div>
+
+  <!-- Game-over overlay -->
+  <div id="game-over-overlay" class="game-over-overlay" style="display:none;">
+    <div class="game-over-card">
+      <div class="game-over-icon" id="game-over-icon">🏆</div>
+      <h2 id="game-over-title">Игра завершена</h2>
+      <p id="game-over-desc"></p>
+      <button class="btn btn-primary" onclick="window.location.href='/'">Новая игра</button>
+    </div>
+  </div>
+
+  <script src="/static/js/game.js"></script>
+</body>
+</html>
